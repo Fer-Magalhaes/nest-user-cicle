@@ -1,0 +1,32 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  isDeletable Boolean  @default(true) // MASTER não pode ser deletada
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  users       User[]
+}
+
+model User {
+  id                String   @id @default(uuid())
+  name              String
+  username          String   @unique
+  email             String   @unique
+  passwordHash      String
+  roleId            String
+  role              Role     @relation(fields: [roleId], references: [id])
+  refreshTokenHash  String?  // último refresh token (hash) válido
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
