@@ -4,7 +4,7 @@ import * as bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 async function main() {
-  // 1. Criar role MASTER (não deletável)
+  // 1. Criar role MASTER (não deletável, com staffStatus)
   let masterRole = await prisma.role.findUnique({ where: { name: 'MASTER' } });
   if (!masterRole) {
     masterRole = await prisma.role.create({
@@ -12,6 +12,7 @@ async function main() {
         name: 'MASTER',
         description: 'Role principal do sistema - não pode ser deletada',
         isDeletable: false,
+        staffStatus: true, // Acesso total ao sistema
       },
     });
     console.log('✅ Role MASTER criada:', masterRole);
@@ -27,6 +28,7 @@ async function main() {
       name: 'ADMIN',
       description: 'Administrador do sistema',
       isDeletable: true,
+      staffStatus: true, // Staff tem acesso a todos os dados
     },
   });
   console.log('✅ Role ADMIN:', adminRole);
@@ -38,6 +40,7 @@ async function main() {
       name: 'USER',
       description: 'Usuário comum',
       isDeletable: true,
+      staffStatus: false, // Usuário comum só vê seus próprios dados
     },
   });
   console.log('✅ Role USER:', userRole);
